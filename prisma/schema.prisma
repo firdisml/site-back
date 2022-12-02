@@ -18,11 +18,54 @@ enum Account {
 }
 
 model User {
-  id            String   @id @default(uuid())
-  email         String   @unique
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-  password      String
-  account_type  Account
-  refresh_token String?
+  id               String            @id @default(uuid())
+  email            String            @unique
+  created_at       DateTime          @default(now())
+  updated_at       DateTime          @updatedAt
+  password         String
+  refresh_token    String?
+  account_type     Account
+  employer_profile Employer_Profile?
+}
+
+model Employer_Profile {
+  id                               String            @id @default(uuid())
+  user                             User              @relation(fields: [user_id], references: [id])
+  user_id                          String            @unique
+  employer_file                    Employer_File?
+  employer_address                 Employer_Address?
+  employer_verification_status     Boolean           @default(false)
+  employer_verification_submission Boolean           @default(false)
+  employer_name                    String
+  employer_size                    String
+  employer_industry                String
+  employer_register_number         String
+  employer_type                    String
+  employer_website                 String
+}
+
+model Employer_Address {
+  id                  String           @id @default(uuid())
+  empployer_profile   Employer_Profile @relation(fields: [employer_profile_id], references: [id])
+  employer_profile_id String           @unique
+  employer_address    String
+  employer_postal     String
+  employer_city       String
+  employer_state      String
+  employer_country    String
+}
+
+model Employer_File {
+  id                  String           @id @default(uuid())
+  empployer_profile   Employer_Profile @relation(fields: [employer_profile_id], references: [id])
+  employer_profile_id String           @unique
+  employer_picture    String
+  employer_document   String
+}
+
+model Employer_Product {
+  id                   String @id @default(uuid())
+  name                 String
+  product_api          String
+  product_credit_value Int
 }

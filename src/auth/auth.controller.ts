@@ -31,12 +31,31 @@ export class AuthController {
       );
   }
 
-  @Post('signin')
-  async signin(
+  @Post('signin/employee')
+  async signin_employee(
     @Body() signInDto: SignInDto,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const user = await this.authService.signin(signInDto);
+    const user = await this.authService.signin_employee(signInDto);
+    response.cookie(
+      'access_token',
+      user.access_token,
+      accessTokenCookieOptions,
+    );
+    if (user.refresh_token)
+      response.cookie(
+        'refresh_token',
+        user.refresh_token,
+        refreshTokenCookieOptions,
+      );
+  }
+
+  @Post('signin/employer')
+  async signin_employer(
+    @Body() signInDto: SignInDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const user = await this.authService.signin_employer(signInDto);
     response.cookie(
       'access_token',
       user.access_token,

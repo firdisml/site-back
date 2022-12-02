@@ -5,6 +5,7 @@ import { SignInDto } from 'src/utils/dto/signin.dto';
 import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { TokenType } from 'src/utils/type';
+import { AccountEnum } from 'src/utils/enum';
 
 @Injectable()
 export class AuthService {
@@ -51,35 +52,71 @@ export class AuthService {
     return tokens;
   }
 
-  async signin(signInDto: SignInDto) {
+  async signin_employee(signInDto: SignInDto) {
     //DTO
     const { email, password } = signInDto;
 
-    //Check existing user
-    const check = await this.prismaService.user.findUnique({
+    //Check if user is employee
+    const check: any = await this.prismaService.user.findMany({
       where: {
-        email: email,
+        AND: [{ email: email }, { account_type: AccountEnum.EMPLOYEE }],
       },
     });
 
     //Throw exception if email not existed
-    if (!check) {
-      throw new ForbiddenException('Access denied!');
+    //Throw error if user is not employee
+    if (check.length !== 1) {
+      throw new ForbiddenException('Access Denied');
     }
 
     //Compare password with argon2
-    const password_check = await argon2.verify(check.password, password);
+    const password_check = await argon2.verify(check[0].password, password);
 
     //Throw error if password not same
     if (!password_check) {
-      throw new ForbiddenException('Access Denied!');
+      throw new ForbiddenException('Access Denied');
     }
 
     //Generate refresh & access token
-    const tokens = await this.generate(check.id);
+    const tokens = await this.generate(check[0].id);
 
     //Update user refresh token
-    await this.replace(check.id, tokens.refresh_token);
+    await this.replace(check[0].id, tokens.refresh_token);
+
+    //return token
+    return tokens;
+  }
+
+  async signin_employer(signInDto: SignInDto) {
+    //DTO
+    const { email, password } = signInDto;
+
+    //Check if user is employer
+    const check: any = await this.prismaService.user.findMany({
+      where: {
+        AND: [{ email: email }, { account_type: AccountEnum.EMPLOYER }],
+      },
+    });
+
+    //Throw exception if email not existed
+    //Throw error if user is not employer
+    if (check.length !== 1) {
+      throw new ForbiddenException('Access Denied');
+    }
+
+    //Compare password with argon2
+    const password_check = await argon2.verify(check[0].password, password);
+
+    //Throw error if password not same
+    if (!password_check) {
+      throw new ForbiddenException('Access Denied');
+    }
+
+    //Generate refresh & access token
+    const tokens = await this.generate(check[0].id);
+
+    //Update user refresh token
+    await this.replace(check[0].id, tokens.refresh_token);
 
     //return token
     return tokens;
