@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { AccessGuard } from 'src/utils/guard';
 import { AccessTokenDecorator } from 'src/utils/decorator/access.decorator';
@@ -11,7 +11,7 @@ export class PaymentController {
   @UseGuards(AccessGuard)
   async employer_checkout(
     @AccessTokenDecorator('user_id') user_id: string,
-    paymentEmployerDto: PaymentEmployerDto,
+    @Body() paymentEmployerDto: PaymentEmployerDto,
   ) {
     return this.paymentService.employer_checkout(user_id, paymentEmployerDto);
   }

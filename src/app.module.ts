@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, CacheModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -11,6 +11,7 @@ import { UserModule } from './user/user.module';
 import { StripeModule } from './utils/stripe/stripe.module';
 import { PaymentModule } from './payment/payment.module';
 import { ProductModule } from './product/product.module';
+import { redisStore } from 'cache-manager-redis-store';
 
 @Module({
   imports: [
@@ -27,6 +28,23 @@ import { ProductModule } from './product/product.module';
     UserModule,
     StripeModule.forRoot(process.env.STRIPE_PRIVATE_KEY, {
       apiVersion: '2022-11-15',
+    }),
+    CacheModule.registerAsync<any>({
+      isGlobal: true,
+      useFactory: async () => {
+        const store = await redisStore({
+          socket: {
+            host: process.env.REDIS_HOST,
+            port: parseInt(process.env.REDIS_PORT),
+          },
+          password: process.env.REDIS_PASSWORD,
+        });
+        return {
+          store: {
+            create: () => store,
+          },
+        };
+      },
     }),
     PaymentModule,
     ProductModule,

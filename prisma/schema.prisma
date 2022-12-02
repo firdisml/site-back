@@ -64,8 +64,11 @@ model Employer_File {
 }
 
 model Employer_Product {
-  id                   String @id @default(uuid())
+  id                   String   @id @default(uuid())
   name                 String
   product_api          String
+  product_price        Decimal
   product_credit_value Int
+  product_description  String
+  product_features     String[]
 }
