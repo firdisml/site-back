@@ -12,6 +12,7 @@ import { StripeModule } from './utils/stripe/stripe.module';
 import { PaymentModule } from './payment/payment.module';
 import { ProductModule } from './product/product.module';
 import { redisStore } from 'cache-manager-redis-store';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { redisStore } from 'cache-manager-redis-store';
     }),
     PaymentModule,
     ProductModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [

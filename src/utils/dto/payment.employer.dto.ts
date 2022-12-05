@@ -9,6 +9,10 @@ import {
 export class PaymentEmployerDto {
   @IsNotEmpty()
   @IsString()
+  employer_profile_id: string;
+
+  @IsNotEmpty()
+  @IsString()
   product_name: string;
 
   @IsNotEmpty()

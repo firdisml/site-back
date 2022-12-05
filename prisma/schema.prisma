@@ -29,25 +29,42 @@ model User {
 }
 
 model Employer_Profile {
-  id                               String            @id @default(uuid())
-  user                             User              @relation(fields: [user_id], references: [id])
-  user_id                          String            @unique
+  id                               String                 @id @default(uuid())
+  user                             User                   @relation(fields: [user_id], references: [id])
+  user_id                          String                 @unique
+  created_at                       DateTime               @default(now())
+  updated_at                       DateTime               @updatedAt
   employer_file                    Employer_File?
   employer_address                 Employer_Address?
-  employer_verification_status     Boolean           @default(false)
-  employer_verification_submission Boolean           @default(false)
+  employer_credit                  Employer_Credit?
+  employer_verification_status     Boolean                @default(false)
+  employer_verification_submission Boolean                @default(false)
   employer_name                    String
   employer_size                    String
   employer_industry                String
   employer_register_number         String
   employer_type                    String
   employer_website                 String
+  employer_transaction             Employer_Transaction[]
+  employer_job_post                Employer_Job_Post[]
+  employer_CreditId                String?
+}
+
+model Employer_Credit {
+  id                      String           @id @default(uuid())
+  employer_profile        Employer_Profile @relation(fields: [employer_profile_id], references: [id])
+  employer_profile_id     String           @unique
+  updated_at              DateTime         @updatedAt
+  employer_credit_status  Boolean          @default(true)
+  employer_credit_balance Int              @default(0)
 }
 
 model Employer_Address {
   id                  String           @id @default(uuid())
-  empployer_profile   Employer_Profile @relation(fields: [employer_profile_id], references: [id])
+  employer_profile    Employer_Profile @relation(fields: [employer_profile_id], references: [id])
   employer_profile_id String           @unique
+  created_at          DateTime         @default(now())
+  updated_at          DateTime         @updatedAt
   employer_address    String
   employer_postal     String
   employer_city       String
@@ -57,18 +74,67 @@ model Employer_Address {
 
 model Employer_File {
   id                  String           @id @default(uuid())
-  empployer_profile   Employer_Profile @relation(fields: [employer_profile_id], references: [id])
+  employer_profile    Employer_Profile @relation(fields: [employer_profile_id], references: [id])
+  created_at          DateTime         @default(now())
+  updated_at          DateTime         @updatedAt
   employer_profile_id String           @unique
   employer_picture    String
   employer_document   String
 }
 
 model Employer_Product {
-  id                   String   @id @default(uuid())
+  id                   String                 @id @default(uuid())
+  created_at           DateTime               @default(now())
+  updated_at           DateTime               @updatedAt
   name                 String
   product_api          String
   product_price        Decimal
   product_credit_value Int
   product_description  String
   product_features     String[]
+  employer_transaction Employer_Transaction[]
+}
+
+model Employer_Transaction {
+  id                   String            @id @default(uuid())
+  employer_profile     Employer_Profile? @relation(fields: [employer_profile_id], references: [id])
+  employer_profile_id  String?
+  employer_product     Employer_Product? @relation(fields: [employer_product_id], references: [id])
+  employer_product_id  String?
+  transaction_status   Boolean           @default(true)
+  created_at           DateTime          @default(now())
+  updated_at           DateTime          @updatedAt
+  account_type         Account
+  stripe_id            String
+  product_api          String
+  product_name         String
+  product_price        String
+  product_credit_value String
+  product_description  String
+  product_feature_1    String
+  product_feature_2    String
+  product_feature_3    String
+}
+
+model Employer_Job_Post {
+  id                    String            @id @default(uuid())
+  employer_profile      Employer_Profile? @relation(fields: [employer_profile_id], references: [id])
+  employer_profile_id   String?
+  created_at            DateTime          @default(now())
+  expired_at            DateTime
+  updated_at            DateTime          @updatedAt
+  job_title             String
+  job_description       String
+  job_requirement       String[]
+  job_qualification     String[]
+  job_benefit           String[]
+  job_scope             String[]
+  job_city              String
+  job_state             String
+  job_country           String
+  job_type              String
+  job_minimum_pay_range Int
+  job_maximum_pay_range Int
+  post_visibility       Boolean           @default(false)
+  post_duration         Int
 }

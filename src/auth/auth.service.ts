@@ -6,6 +6,7 @@ import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { TokenType } from 'src/utils/type';
 import { AccountEnum } from 'src/utils/enum';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -34,7 +35,7 @@ export class AuthService {
     const hash = await this.hashData(password);
 
     //Insert new user
-    const user = await this.prismaService.user.create({
+    const user: User = await this.prismaService.user.create({
       data: {
         email: email,
         password: hash,
@@ -43,7 +44,10 @@ export class AuthService {
     });
 
     //Generate refresh & access token
-    const tokens = await this.generate(user.id);
+    const tokens = await this.generate(
+      user.id,
+      user.account_type as AccountEnum,
+    );
 
     //Update user refresh token
     await this.replace(user.id, tokens.refresh_token);
@@ -57,7 +61,7 @@ export class AuthService {
     const { email, password } = signInDto;
 
     //Check if user is employee
-    const check: any = await this.prismaService.user.findMany({
+    const check: User[] = await this.prismaService.user.findMany({
       where: {
         AND: [{ email: email }, { account_type: AccountEnum.EMPLOYEE }],
       },
@@ -78,7 +82,10 @@ export class AuthService {
     }
 
     //Generate refresh & access token
-    const tokens = await this.generate(check[0].id);
+    const tokens = await this.generate(
+      check[0].id,
+      check[0].account_type as AccountEnum,
+    );
 
     //Update user refresh token
     await this.replace(check[0].id, tokens.refresh_token);
@@ -92,7 +99,7 @@ export class AuthService {
     const { email, password } = signInDto;
 
     //Check if user is employer
-    const check: any = await this.prismaService.user.findMany({
+    const check: User[] = await this.prismaService.user.findMany({
       where: {
         AND: [{ email: email }, { account_type: AccountEnum.EMPLOYER }],
       },
@@ -113,7 +120,10 @@ export class AuthService {
     }
 
     //Generate refresh & access token
-    const tokens = await this.generate(check[0].id);
+    const tokens = await this.generate(
+      check[0].id,
+      check[0].account_type as AccountEnum,
+    );
 
     //Update user refresh token
     await this.replace(check[0].id, tokens.refresh_token);
@@ -142,7 +152,7 @@ export class AuthService {
     refresh_token: string,
   ): Promise<TokenType> {
     //Check if user is exist
-    const user = await this.prismaService.user.findUnique({
+    const user: User = await this.prismaService.user.findUnique({
       where: {
         id: user_id,
       },
@@ -162,7 +172,10 @@ export class AuthService {
     }
 
     //Issue new access token and refresh token
-    const tokens = await this.generate(user.id);
+    const tokens = await this.generate(
+      user.id,
+      user.account_type as AccountEnum,
+    );
 
     //Update the token in user database
     await this.replace(user.id, tokens.refresh_token);
@@ -175,12 +188,16 @@ export class AuthService {
   /*  This is a helper function section  */
   /*  This is a helper function section  */
 
-  async generate(user_id: string): Promise<TokenType> {
+  async generate(
+    user_id: string,
+    account_type: AccountEnum,
+  ): Promise<TokenType> {
     //Sign user' JWT access and refresh token
     const [access_token, refresh_token] = await Promise.all([
       this.jwtService.signAsync(
         {
           user_id,
+          account_type,
         },
         {
           secret: process.env.ACCESS_TOKEN_SECRET,
@@ -190,6 +207,7 @@ export class AuthService {
       this.jwtService.signAsync(
         {
           user_id,
+          account_type,
         },
         {
           secret: process.env.REFRESH_TOKEN_SECRET,

@@ -138,6 +138,11 @@ export class VerificationService {
                 employer_country: employerVerificationDto.employer_country,
               },
             },
+            employer_credit: {
+              create: {
+                employer_credit_balance: 0,
+              },
+            },
           },
         },
       },

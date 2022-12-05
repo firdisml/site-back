@@ -2,6 +2,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { Request } from 'express';
+import { AccessPayloadType } from '../type';
 
 @Injectable()
 export class AccessStrategy extends PassportStrategy(Strategy, 'access-jwt') {
@@ -21,7 +22,7 @@ export class AccessStrategy extends PassportStrategy(Strategy, 'access-jwt') {
     });
   }
 
-  async validate(req: Request, payload: any) {
+  async validate(req: Request, payload: AccessPayloadType) {
     if (!payload) {
       throw new BadRequestException('Invalid JWT token');
     }
