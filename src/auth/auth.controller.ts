@@ -1,12 +1,15 @@
-import { Controller, Post, Body, Res, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Res, UseGuards, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from 'src/utils/dto';
 import { SignInDto } from 'src/utils/dto/signin.dto';
 import { Response } from 'express';
 import { accessTokenCookieOptions } from 'src/utils/option';
 import { refreshTokenCookieOptions } from 'src/utils/option';
-import { RefreshGuard } from 'src/utils/guard';
+import { AccessGuard, RefreshGuard } from 'src/utils/guard';
 import { RefreshTokenDecorator } from 'src/utils/decorator/refresh.decorator';
+import { RolesDecorator } from 'src/utils/decorator/roles.decorator';
+import { AccountEnum } from 'src/utils/enum';
+import { RolesGuard } from 'src/utils/guard/roles.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -99,5 +102,12 @@ export class AuthController {
         user.refresh_token,
         refreshTokenCookieOptions,
       );
+  }
+
+  @Get('hello')
+  @RolesDecorator(AccountEnum.EMPLOYEE)
+  @UseGuards(AccessGuard, RolesGuard)
+  Hello() {
+    return { hello: 'hello' };
   }
 }
