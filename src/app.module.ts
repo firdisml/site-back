@@ -13,6 +13,7 @@ import { PaymentModule } from './payment/payment.module';
 import { ProductModule } from './product/product.module';
 import { redisStore } from 'cache-manager-redis-store';
 import { TransactionModule } from './transaction/transaction.module';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { TransactionModule } from './transaction/transaction.module';
     PaymentModule,
     ProductModule,
     TransactionModule,
+    PostModule,
   ],
   controllers: [AppController],
   providers: [

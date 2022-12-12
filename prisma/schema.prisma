@@ -121,20 +121,25 @@ model Employer_Job_Post {
   employer_profile      Employer_Profile? @relation(fields: [employer_profile_id], references: [id])
   employer_profile_id   String?
   created_at            DateTime          @default(now())
-  expired_at            DateTime
+  expired_at            DateTime?
+  approved_at           DateTime?
+  renewed_at            DateTime?
   updated_at            DateTime          @updatedAt
   job_title             String
-  job_description       String
-  job_requirement       String[]
-  job_qualification     String[]
-  job_benefit           String[]
-  job_scope             String[]
+  job_minimum_pay_range Decimal
+  job_maximum_pay_range Decimal
+  job_type              String
+  job_about             String
+  job_experience        String
+  job_arrangement       String
+  job_descriptions      String[]
+  job_requirements      String[]
+  job_skills            String[]
+  job_tags              String[]
   job_city              String
   job_state             String
-  job_country           String
-  job_type              String
-  job_minimum_pay_range Int
-  job_maximum_pay_range Int
+  job_post_package      String
+  job_post_credit       Int
+  job_post_duration     Int
   post_visibility       Boolean           @default(false)
-  post_duration         Int
 }

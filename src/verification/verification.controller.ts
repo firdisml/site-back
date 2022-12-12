@@ -11,13 +11,17 @@ import { VerificationService } from './verification.service';
 import { EmployerVerificationDto } from 'src/utils/dto';
 import { AccessTokenDecorator } from 'src/utils/decorator/access.decorator';
 import { AccessGuard } from 'src/utils/guard';
+import { RolesDecorator } from 'src/utils/decorator/roles.decorator';
+import { AccountEnum } from 'src/utils/enum';
+import { RolesGuard } from 'src/utils/guard/roles.guard';
 
 @Controller('verification')
 export class VerificationController {
   constructor(private readonly verificationService: VerificationService) {}
 
   @Post('employer/submission')
-  @UseGuards(AccessGuard)
+  @UseGuards(AccessGuard, RolesGuard)
+  @RolesDecorator(AccountEnum.EMPLOYER)
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'employer_picture', maxCount: 1 },
