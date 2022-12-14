@@ -90,8 +90,6 @@ model Employer_Product {
   product_api          String
   product_price        Decimal
   product_credit_value Int
-  product_description  String
-  product_features     String[]
   employer_transaction Employer_Transaction[]
 }
 
@@ -101,19 +99,21 @@ model Employer_Transaction {
   employer_profile_id  String?
   employer_product     Employer_Product? @relation(fields: [employer_product_id], references: [id])
   employer_product_id  String?
+  employer_email       String
   transaction_status   Boolean           @default(true)
   created_at           DateTime          @default(now())
   updated_at           DateTime          @updatedAt
   account_type         Account
-  stripe_id            String
+  intent_id            String            @unique
+  session_id           String            @unique
   product_api          String
   product_name         String
-  product_price        String
-  product_credit_value String
-  product_description  String
-  product_feature_1    String
-  product_feature_2    String
-  product_feature_3    String
+  product_price        Decimal
+  product_credit_value Int
+  amount_subtotal      Decimal
+  amount_total         Decimal
+  amount_tax           Decimal
+  amount_discount      Decimal
 }
 
 model Employer_Job_Post {
@@ -142,4 +142,5 @@ model Employer_Job_Post {
   job_post_credit       Int
   job_post_duration     Int
   post_visibility       Boolean           @default(false)
+  post_pending          Boolean           @default(false)
 }

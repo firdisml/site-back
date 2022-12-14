@@ -29,7 +29,7 @@ export class TransactionController {
     );
   }
 
-  @Get('employer/transaction/:transaction_id')
+  @Get('employer/transaction/:session_id')
   @UseGuards(AccessGuard)
   fetch_unique_employer_transaction(
     @Param()

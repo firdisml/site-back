@@ -4,6 +4,7 @@ import { STRIPE_CLIENT } from 'src/utils/option';
 import { PrismaService } from 'src/utils/prisma/prisma.service';
 import { PaymentEmployerDto } from 'src/utils/dto/payment.employer.dto';
 import { AccountEnum } from 'src/utils/enum';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PaymentService {
@@ -18,22 +19,21 @@ export class PaymentService {
   ) {
     //Create payment employer session
     const checkout = await this.stripe.checkout.sessions.create({
+      customer_email: paymentEmployerDto.user_email,
+      currency: 'myr',
       line_items: [{ price: paymentEmployerDto.product_api, quantity: 1 }],
       mode: 'payment',
-      success_url: 'https://example.com/success',
-      cancel_url: 'https://example.com/cancel',
+      success_url: 'http://localhost:3001/reload/success/{CHECKOUT_SESSION_ID}',
+      cancel_url: 'http://localhost:3001/reload/unsuccessful',
       metadata: {
         account_type,
+        user_email: paymentEmployerDto.user_email,
         employer_profile_id: paymentEmployerDto.employer_profile_id,
         product_id: paymentEmployerDto.product_id,
         product_name: paymentEmployerDto.product_name,
         product_api: paymentEmployerDto.product_api,
         product_price: paymentEmployerDto.product_price,
         product_credit_value: paymentEmployerDto.product_credit_value,
-        product_description: paymentEmployerDto.product_description,
-        product_feature_1: paymentEmployerDto.product_features[0],
-        product_feature_2: paymentEmployerDto.product_features[1],
-        product_feature_3: paymentEmployerDto.product_features[2],
       },
     });
 
@@ -47,21 +47,27 @@ export class PaymentService {
           account_type: session.metadata.account_type,
           employer_profile_id: session.metadata.employer_profile_id,
           employer_product_id: session.metadata.product_id,
-          stripe_id: session.payment_intent,
+          intent_id: session.payment_intent,
+          session_id: session.id,
           product_name: session.metadata.product_name,
           product_api: session.metadata.product_api,
-          product_price: session.metadata.product_price,
-          product_credit_value: session.metadata.product_credit_value,
-          product_description: session.metadata.product_description,
-          product_feature_1: session.metadata.product_feature_1,
-          product_feature_2: session.metadata.product_feature_2,
-          product_feature_3: session.metadata.product_feature_3,
+          product_price: new Prisma.Decimal(
+            parseFloat(session.metadata.product_price),
+          ),
+          employer_email: session.metadata.user_email,
+          product_credit_value: parseInt(session.metadata.product_credit_value),
+          amount_subtotal: new Prisma.Decimal(session.amount_subtotal),
+          amount_total: new Prisma.Decimal(session.amount_total),
+          amount_tax: new Prisma.Decimal(session.total_details.amount_tax),
+          amount_discount: new Prisma.Decimal(
+            session.total_details.amount_discount,
+          ),
         },
       });
 
       this.update_employer_credit_balance(
         store.employer_profile_id,
-        parseInt(store.product_credit_value),
+        store.product_credit_value,
       );
     } else if (session.metadata.account_type === AccountEnum.EMPLOYEE) {
       console.log('Employee');

@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+/* import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -9,7 +9,6 @@ async function main() {
       product_api: 'price_1LzPxhC3J13TnkehVXwawAAK',
       product_credit_value: 40,
       product_price: new Prisma.Decimal(54.454545),
-      product_description: 'Recruit anyone anytime anywhere',
       product_features: [
         'Potenti felis, in cras at at lingula',
         'Potenti felis, in cras at at lingula',
@@ -20,3 +19,4 @@ async function main() {
 }
 
 main();
+ */

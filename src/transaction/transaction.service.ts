@@ -42,7 +42,7 @@ export class TransactionService {
     const transaction =
       await this.prismaService.employer_Transaction.findUnique({
         where: {
-          id: employerUniqueTransactionDto.transaction_id,
+          session_id: employerUniqueTransactionDto.session_id,
         },
       });
 

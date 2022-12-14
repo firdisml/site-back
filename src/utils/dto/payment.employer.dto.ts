@@ -1,15 +1,18 @@
-import {
-  IsNotEmpty,
-  IsString,
-  IsArray,
-  ArrayMinSize,
-  ArrayMaxSize,
-} from 'class-validator';
+import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
 
 export class PaymentEmployerDto {
   @IsNotEmpty()
   @IsString()
   employer_profile_id: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @IsEmail()
+  user_email: string;
+
+  @IsNotEmpty()
+  @IsString()
+  product_id: string;
 
   @IsNotEmpty()
   @IsString()
@@ -21,24 +24,9 @@ export class PaymentEmployerDto {
 
   @IsNotEmpty()
   @IsString()
-  product_id: string;
-
-  @IsNotEmpty()
-  @IsString()
   product_price: number;
 
   @IsNotEmpty()
   @IsString()
-  product_description: string;
-
-  @IsNotEmpty()
-  @IsString()
   product_credit_value: number;
-
-  @IsNotEmpty()
-  @IsString({ each: true })
-  @IsArray()
-  @ArrayMinSize(1)
-  @ArrayMaxSize(3)
-  product_features: string[];
 }
